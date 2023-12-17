@@ -1,0 +1,180 @@
+library(googledrive)
+library(tidyverse)
+library(lubridate)
+library(MetBrewer)
+library(patchwork)
+
+# Find IDs of recent uploads
+drive_find(n_max = 10)
+
+### Remove temp files
+removefiles = list(list.files("TempData/", full.names = TRUE, pattern = '.dat'))
+do.call(file.remove, removefiles)
+
+##### Download data to temp folder #####
+# BOYM15
+drive_download(as_id('129Xy8dP5ghs4Sbk_FOmJdkiE_Zo18bP5'), path = 'TempData/BOYM15.dat', overwrite = TRUE)
+# BRHM15
+drive_download(as_id('13VKHeWqLe2QN7fYdskBxkPwWrvXy5wYh'), path = 'TempData/BRHM15.dat', overwrite = TRUE)
+# CAAM15
+drive_download(as_id('15Fe8HHJMkumgu7cYmqM2nmVV-csG_bUD'), path = 'TempData/CAAM15.dat', overwrite = TRUE)
+# COHM15
+drive_download(as_id('13MdIZKde_XaqExVfjNM-34NZAeMd-WMJ'), path = 'TempData/COHM15.dat', overwrite = TRUE)
+# EXEM15
+drive_download(as_id('13DD4emyuwF-mhnGPO_pOldFm6Hk34p7C'), path = 'TempData/EXEM15.dat', overwrite = TRUE)
+# FLMM15
+drive_download(as_id('17cdUcPgkRHweXxvTp4W5P6qPEQAXAxKh'), path = 'TempData/FLMM15.dat', overwrite = TRUE)
+# FRLM15
+drive_download(as_id('15anL99xr6c6u0KxQJj8CZPAyknDcA4q6'), path = 'TempData/FRLM15.dat', overwrite = TRUE)
+# HODM15
+drive_download(as_id('15VxBHxdX0bsI-W1LKN6tOxUq_HH7tx-Z'), path = 'TempData/HODM15.dat', overwrite = TRUE)
+# HO2M15
+drive_download(as_id('1-nf_T9RlSX6G4oxF8ol4x4zdOoMJu7i2'), path = 'TempData/HO2M15.dat', overwrite = TRUE)
+# TARM15
+drive_download(as_id('17Q-WIIASlNG-LmSmIIZpHu1LWGO5B1VK'), path = 'TempData/TARM15.dat', overwrite = TRUE)
+# VAAM15
+drive_download(as_id('13VGm6aX6H5gepaWzchw_8eiS_0LBoEzR'), path = 'TempData/VAAM15.dat', overwrite = TRUE)
+# VIAM15
+drive_download(as_id('15CiY1JvquJdIB7adFH_dg9qe6HU52kJ1'), path = 'TempData/VIAM15.dat', overwrite = TRUE)
+# 
+# drive_download(as_id(''), path = 'TempData/.dat', overwrite = TRUE)
+
+
+files = list.files(path = 'TempData', full.names = T, pattern = '.dat')
+files.short = list.files(path = 'TempData', pattern = '.dat')
+sitenames = stringr::str_sub(files.short, 1,4)
+
+met.long.list = list() # For all sites
+for (i in 1:length(sitenames)) {
+  # indx = grepl(sitenames[i],files.short)
+  file = files[i]
+  sitename = sitenames[i]
+  
+  # Read in met file 
+  site = read.csv(file, skip = 0, header = F, nrows = 1, as.is = T) |>
+    select(2) |> pull(1)
+  headers = read.csv(file, skip = 1, header = F, nrows = 1, as.is = T)
+  met.df = read_csv(file, skip = 3) |> mutate(sitename = sitename)
+  colnames(met.df) = c(headers, 'sitename')
+  met.df = met.df |> mutate(Year = year(TIMESTAMP))
+  
+  if (!'Day_of_Year' %in% names(met.df)){
+    met.df = met.df |> mutate(Day_of_Year = yday(TIMESTAMP))
+    met.df = met.df |> mutate(DecTime_2 = NA_complex_)
+  }
+  
+  # Convert to long 
+  met.df.long = met.df |> select(-RECORD, -Year, -(Day_of_Year:DecTime_2)) |>
+    arrange(TIMESTAMP) |>
+    pivot_longer(cols = -c(TIMESTAMP, sitename), names_to = 'Var')
+  
+  met.long.list[[i]] = met.df.long
+}
+
+met.df = do.call(bind_rows, met.long.list) |> 
+  filter(TIMESTAMP >= as.POSIXct('2023-11-22'))
+
+### Remove temp files
+removefiles = list(list.files("TempData/", full.names = TRUE, pattern = '.dat'))
+do.call(file.remove, removefiles)
+
+# get table of variables
+table(met.df$Var)
+
+# Just battery plots
+p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
+  ylab('Battery (V)') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~sitename, ncol = 3)
+
+# Save figure 
+ggsave('Figures/Met_Battery.pdf', width = 12, height = 10)
+
+# Glacier stations
+glacier.df = met.df |> 
+  filter(sitename %in% c('CAAM','COHM','HODM','TARM'))
+
+met.df = met.df |> 
+  filter(!sitename %in% c('CAAM','COHM','HODM','TARM'))
+
+### Plot 
+p1 = ggplot(met.df |> filter(Var == 'AirT3m')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  ylab('Temp (°C)') +
+  scale_color_met_d(name = 'VanGogh2') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank())
+
+p2 = ggplot(met.df |> filter(Var == 'WSpd_Avg')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  ylab('Wind Speed (m/s)') +
+  scale_color_met_d(name = 'VanGogh2') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank())
+
+p3 = ggplot(met.df |> filter(Var == 'SwRadIn')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  ylab('SW In (W/m2)') +
+  scale_color_met_d(name = 'VanGogh2') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank())
+
+p6 = ggplot(met.df |> filter(Var == 'BattV_Min')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  ylab('Battery (V)') +
+  scale_color_met_d(name = 'VanGogh2') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank())
+
+# Join plots 
+p1 + p2 + p3 + p6 + plot_layout(guides = 'collect')
+# Save figure 
+ggsave('Figures/Met_Ground_Telemetry.pdf', width = 12, height = 10)
+
+
+### Plot 
+p1 = ggplot(glacier.df |> filter(Var == 'AirT3m')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  ylab('Temp (°C)') +
+  scale_color_met_d(name = 'VanGogh2') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank())
+
+p2 = ggplot(glacier.df |> filter(Var == 'WSpd_Avg')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  ylab('Wind Speed (m/s)') +
+  scale_color_met_d(name = 'VanGogh2') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank())
+
+p3 = ggplot(glacier.df |> filter(Var == 'SwRadIn')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  ylab('SW In (W/m2)') +
+  scale_color_met_d(name = 'VanGogh2') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank())
+
+p6 = ggplot(glacier.df |> filter(Var == 'BattV_Min')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  ylab('Battery (V)') +
+  scale_color_met_d(name = 'VanGogh2') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank())
+
+# Join plots 
+p1 + p2 + p3 + p6 + plot_layout(guides = 'collect')
+# Save figure 
+ggsave('Figures/Met_Glacier_Telemetry.pdf', width = 12, height = 10)
+
+
