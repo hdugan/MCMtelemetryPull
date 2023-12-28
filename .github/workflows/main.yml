@@ -19,6 +19,9 @@ jobs:
  autoscrape:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    env:
+      REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+      GDRIVE_PAT: ${{ secrets.GDRIVE_PAT }}
 
     # Load repo and install R
     steps:
@@ -40,11 +43,18 @@ jobs:
     # Set-up R
     - name: Install packages
       run: |
-        R -e 'install.packages("tidyverse")'
-
+        R -e 'install.packages("googledrive")'
+        R -e 'install.packages("dplyr")'
+        R -e 'install.packages("ggplot2")'
+        R -e 'install.packages("tidyr")'
+        R -e 'install.packages("lubridate")'
+        R -e 'install.packages("oce")'
+      
     # Run R script
     - name: Scrape
-      run: Rscript src/PullBB.R
+      run: |
+        Rscript src/PullBB.R
+    # Rscript src/PullMet.R
       
  # Add new files in data folder, commit along with other modified files, push
     - name: Commit files
@@ -57,3 +67,4 @@ jobs:
       env:
         REPO_KEY: ${{secrets.GITHUB_TOKEN}}
         username: github-actions
+        GDRIVE_PAT: ${{ secrets.GDRIVE_PAT }}

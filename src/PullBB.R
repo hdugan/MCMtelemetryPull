@@ -6,8 +6,9 @@ library(tidyr)
 library(lubridate)
 source('src/DOconvert.R')
 
-pack <- available.packages()
-pack["lubridate","Imports"]
+# for googledrive
+# drive_auth(path = 'ignore/mcmtelemetrypull-d1867fa65877.json') # for local
+drive_auth(path = Sys.getenv('GDRIVE_PAT')) # for github action
 
 # Find IDs of recent uploads
 drive_find(n_max = 10)
@@ -109,7 +110,6 @@ bb.df |> filter(Var %in% c(#'OSat_Dshallow_Avg','OSat_DOdeep_Avg',
 
 # Save figure 
 ggsave('Figures/BB_Oxygen.pdf', width = 12, height = 10)
-
 
 
 # Just battery plots
