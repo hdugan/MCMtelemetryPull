@@ -68,4 +68,3 @@ jobs:
       env:
         REPO_KEY: ${{secrets.GITHUB_TOKEN}}
         username: github-actions
-        GDRIVE_PAT: ${{ secrets.GDRIVE_PAT }}
