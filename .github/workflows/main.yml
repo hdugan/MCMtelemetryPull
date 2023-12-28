@@ -22,6 +22,7 @@ jobs:
     env:
       REPO_KEY: ${{secrets.GITHUB_TOKEN}}
       GDRIVE_PAT: ${{ secrets.GDRIVE_PAT }}
+      username: github-actions
 
     # Load repo and install R
     steps:
