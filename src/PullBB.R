@@ -94,6 +94,8 @@ bb.df |> filter(Var %in% c('PTemp_C', 'stage_Avg', 'OSat_Dshallow_Avg',
 
 # Save figure 
 ggsave('Figures/BB_Telemetry.pdf', width = 12, height = 10)
+ggsave('Figures/BB_Telemetry.png', width = 8, height = 5)
+
 
 ### Plot oxygen correct
 bb.df |> filter(Var %in% c(#'OSat_Dshallow_Avg','OSat_DOdeep_Avg', 

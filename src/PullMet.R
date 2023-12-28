@@ -3,7 +3,7 @@ library(tidyverse)
 library(lubridate)
 
 # Find IDs of recent uploads
-# drive_find(n_max = 10)
+drive_find(n_max = 10)
 
 ### Remove temp files
 removefiles = list(list.files("TempData/", full.names = TRUE, pattern = '.dat'))
@@ -113,7 +113,7 @@ met.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
 
 # Save figure 
 ggsave('Figures/Met_Ground_Telemetry.pdf', width = 12, height = 10)
-
+ggsave('Figures/Met_Ground_Telemetry.png', width = 8, height = 5)
 
 ### Plot major variables
 glacier.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
@@ -130,6 +130,7 @@ glacier.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
 
 # Save figure 
 ggsave('Figures/Met_Glacier_Telemetry.pdf', width = 12, height = 10)
+ggsave('Figures/Met_Glacier_Telemetry.png', width = 8, height = 5)
 
 ## Plot precipitation at Bonney and Hoare
 precip = met.df |> filter(sitename %in% c('BOYM', 'HO2M'), Var == 'Precip_TotalNRT')
@@ -143,4 +144,4 @@ ggplot(precip) +
   theme(axis.title.x = element_blank())
 
 ggsave('Figures/Met_Precip_Telemetry.pdf', width = 6, height = 4)
-
+ggsave('Figures/Met_Precip_Telemetry.png', width = 8, height = 4)
