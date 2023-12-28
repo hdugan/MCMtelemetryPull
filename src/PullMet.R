@@ -1,8 +1,6 @@
 library(googledrive)
 library(tidyverse)
 library(lubridate)
-library(MetBrewer)
-library(patchwork)
 
 # Find IDs of recent uploads
 # drive_find(n_max = 10)
@@ -100,80 +98,36 @@ glacier.df = met.df |>
 met.df = met.df |> 
   filter(!sitename %in% c('CAAM','COHM','HODM','TARM'))
 
-### Plot 
-p1 = ggplot(met.df |> filter(Var == 'AirT3m')) +
+### Plot major variables
+met.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
+                            'BattV_Min')) |> 
+  ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
-  ylab('Temp (°C)') +
-  scale_color_met_d(name = 'VanGogh2') +
+  # ylab('Temp (°C)') +
+  scale_color_manual(values = c("#bd3106", "#d9700e", "#e9a00e", "#eebe04", "#5b7314",
+                                "#c3d6ce", "#89a6bb", "#454b87")) +
   theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~Var, scales = 'free_y')
 
-p2 = ggplot(met.df |> filter(Var == 'WSpd_Avg')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
-  ylab('Wind Speed (m/s)') +
-  scale_color_met_d(name = 'VanGogh2') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-p3 = ggplot(met.df |> filter(Var == 'SwRadIn')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
-  ylab('SW In (W/m2)') +
-  scale_color_met_d(name = 'VanGogh2') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-p6 = ggplot(met.df |> filter(Var == 'BattV_Min')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
-  ylab('Battery (V)') +
-  scale_color_met_d(name = 'VanGogh2') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-# Join plots 
-p1 + p2 + p3 + p6 + plot_layout(guides = 'collect')
 # Save figure 
 ggsave('Figures/Met_Ground_Telemetry.pdf', width = 12, height = 10)
 
 
-### Plot 
-p1 = ggplot(glacier.df |> filter(Var == 'AirT3m')) +
+### Plot major variables
+glacier.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
+                                'BattV_Min')) |> 
+  ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
-  ylab('Temp (°C)') +
-  scale_color_met_d(name = 'VanGogh2') +
+  # ylab('Temp (°C)') +
+  scale_color_manual(values = c("#bd3106", "#eebe04", "#5b7314",
+                                "#454b87")) +
   theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~Var, scales = 'free_y')
 
-p2 = ggplot(glacier.df |> filter(Var == 'WSpd_Avg')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
-  ylab('Wind Speed (m/s)') +
-  scale_color_met_d(name = 'VanGogh2') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-p3 = ggplot(glacier.df |> filter(Var == 'SwRadIn')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
-  ylab('SW In (W/m2)') +
-  scale_color_met_d(name = 'VanGogh2') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-p6 = ggplot(glacier.df |> filter(Var == 'BattV_Min')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
-  ylab('Battery (V)') +
-  scale_color_met_d(name = 'VanGogh2') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-# Join plots 
-p1 + p2 + p3 + p6 + plot_layout(guides = 'collect')
 # Save figure 
 ggsave('Figures/Met_Glacier_Telemetry.pdf', width = 12, height = 10)
 
@@ -183,8 +137,10 @@ precip = met.df |> filter(sitename %in% c('BOYM', 'HO2M'), Var == 'Precip_TotalN
 ggplot(precip) +
   geom_point(aes(x = TIMESTAMP, y = value, fill = sitename), shape = 21, stroke = 0.01) +
   ylab('Precip Total NRT (mm)') +
-  scale_fill_met_d(name = 'VanGogh2') +
+  scale_fill_manual(values = c("#bd3106", 
+                               "#454b87")) +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank())
+
 ggsave('Figures/Met_Precip_Telemetry.pdf', width = 6, height = 4)
 
