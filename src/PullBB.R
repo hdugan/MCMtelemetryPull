@@ -1,8 +1,13 @@
 library(googledrive)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(tidyr)
 library(lubridate)
-library(MetBrewer)
-library(patchwork)
+source('src/DOconvert.R')
+
+pack <- available.packages()
+pack["lubridate","Imports"]
 
 # Find IDs of recent uploads
 drive_find(n_max = 10)
@@ -31,7 +36,7 @@ drive_download(as_id('10wlT2XtOglhaL2zosDCfwcD_PCm8Jds0'), path = 'TempData/WLBB
 
 files = list.files(path = 'TempData', full.names = T, pattern = '.dat')
 files.short = list.files(path = 'TempData', pattern = '.dat')
-sitenames = stringr::str_sub(files.short, 1,4)
+sitenames = substr(files.short, start = 1, stop = 4)
 
 bb.long.list = list() # For all sites
 for (i in 1:length(sitenames)) {
@@ -47,6 +52,17 @@ for (i in 1:length(sitenames)) {
   colnames(bb.df) = c(headers, 'sitename')
   bb.df = bb.df |> mutate(Year = year(TIMESTAMP))
 
+  # Add in salinity and DO solubility
+  topS = top.sal |> filter(location == sitename) |> pull(salinity)
+  botS = bot.sal |> filter(location == sitename) |> pull(salinity)
+  
+  bb.df = 
+    bb.df |> 
+    mutate(DOsolubilitytop = do(Temp_DOshallow_Avg + 273.15) * fs(Temp_DOshallow_Avg + 273.14, topS)) |> 
+    mutate(DOsolubilitybot = do(Temp_DOdeep_Avg + 273.15) * fs(Temp_DOdeep_Avg + 273.14, botS)) |> 
+    mutate(DO.actualShallow.mgl = DOsolubilitytop * OSat_Dshallow_Avg/100) |> 
+    mutate(DO.actualDeep.mgl = DOsolubilitybot * OSat_DOdeep_Avg/100)
+    
   # Convert to long 
   bb.df.long = bb.df |> select(-RECORD, -Year, -(Day_of_Year:DecTime_2)) |>
     arrange(TIMESTAMP) |>
@@ -63,67 +79,45 @@ bb.df = do.call(bind_rows, bb.long.list) |>
 removefiles = list(list.files("TempData/", full.names = TRUE, pattern = '.dat'))
 do.call(file.remove, removefiles)
 
-### Plot 
-p1 = ggplot(bb.df |> filter(Var == 'PTemp_C')) +
+### Plot major variables
+bb.df |> filter(Var %in% c('PTemp_C', 'stage_Avg', 'OSat_Dshallow_Avg',
+                           'OSat_DOdeep_Avg', 'ablation_Avg', 'BattV_Min')) |> 
+  ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
-  ylab('Temp (°C)') +
-  scale_color_met_d(name = 'Egypt') +
+  # ylab('Temp (°C)') +
+  scale_color_manual(values = c("#dd5129", "#0f7ba2", "#43b284", "#fab255")) +
   theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~Var, scales = 'free_y')
 
-p2 = ggplot(bb.df |> filter(Var == 'stage_Avg')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
-  ylab('Stage (m)') +
-  scale_color_met_d(name = 'Egypt') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-p3 = ggplot(bb.df |> filter(Var == 'OSat_Dshallow_Avg')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
-  ylab('DO Shallow (%)') +
-  scale_color_met_d(name = 'Egypt') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-p4 = ggplot(bb.df |> filter(Var == 'OSat_DOdeep_Avg')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
-  ylab('DO Shallow (%)') +
-  scale_color_met_d(name = 'Egypt') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-p5 = ggplot(bb.df |> filter(Var == 'ablation_Avg')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
-  ylab('Ablation (m)') +
-  scale_color_met_d(name = 'Egypt') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-p6 = ggplot(bb.df |> filter(Var == 'BattV_Min')) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
-  ylab('Battery (V)') +
-  scale_color_met_d(name = 'Egypt') +
-  theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank())
-
-# Join plots 
-p1 + p2 + p5 + p3 + p4 + p6 + plot_layout(guides = 'collect')
 # Save figure 
 ggsave('Figures/BB_Telemetry.pdf', width = 12, height = 10)
 
-# Just battery plots
+### Plot oxygen correct
+bb.df |> filter(Var %in% c(#'OSat_Dshallow_Avg','OSat_DOdeep_Avg', 
+                           "Conc_mgL_DOshallow_Avg", "Conc_mgL_DOdeep_Avg",
+                           "DO.actualShallow.mgl", "DO.actualDeep.mgl")) |> 
+  ggplot() +
+  geom_path(aes(x = TIMESTAMP, y = value, color = Var)) +
+  xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
+  ylab('DO (mg/L)') +
+  scale_color_manual(values = c("#dd5129", "#0f7ba2", "red4", "navy")) +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~sitename, scales = 'free_y')
 
-p.batt = ggplot(bb.df |> filter(Var == 'BattV_Min')) +
+# Save figure 
+ggsave('Figures/BB_Oxygen.pdf', width = 12, height = 10)
+
+
+
+# Just battery plots
+ggplot(bb.df |> filter(Var == 'BattV_Min')) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
   ylab('Battery (V)') +
-  scale_color_met_d(name = 'Egypt') +
+  scale_color_manual(values = c("#dd5129", "#0f7ba2", "#43b284", "#fab255")) +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank()) +
   facet_wrap(~sitename)

@@ -177,4 +177,14 @@ p1 + p2 + p3 + p6 + plot_layout(guides = 'collect')
 # Save figure 
 ggsave('Figures/Met_Glacier_Telemetry.pdf', width = 12, height = 10)
 
+## Plot precipitation at Bonney and Hoare
+precip = met.df |> filter(sitename %in% c('BOYM', 'HO2M'), Var == 'Precip_TotalNRT')
+
+ggplot(precip) +
+  geom_point(aes(x = TIMESTAMP, y = value, fill = sitename), shape = 21, stroke = 0.01) +
+  ylab('Precip Total NRT (mm)') +
+  scale_fill_met_d(name = 'VanGogh2') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank())
+ggsave('Figures/Met_Precip_Telemetry.pdf', width = 6, height = 4)
 
