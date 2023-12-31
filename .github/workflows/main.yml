@@ -56,7 +56,7 @@ jobs:
     - name: Scrape
       run: |
         Rscript src/PullBB.R
-    # Rscript src/PullMet.R
+        Rscript src/PullMet.R
       
  # Add new files in data folder, commit along with other modified files, push
     - name: Commit files

@@ -3,7 +3,7 @@ library(tidyverse)
 library(lubridate)
 
 # Find IDs of recent uploads
-drive_find(n_max = 10)
+# drive_find(n_max = 10)
 
 ### Remove temp files
 removefiles = list(list.files("TempData/", full.names = TRUE, pattern = '.dat'))
@@ -82,7 +82,7 @@ table(met.df$Var)
 # Just battery plots
 p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date()) +
+  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
   ylab('Battery (V)') +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank()) +
@@ -103,7 +103,7 @@ met.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
                             'BattV_Min')) |> 
   ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date() + 1) +
   # ylab('Temp (°C)') +
   scale_color_manual(values = c("#bd3106", "#d9700e", "#e9a00e", "#eebe04", "#5b7314",
                                 "#c3d6ce", "#89a6bb", "#454b87")) +
@@ -120,7 +120,7 @@ glacier.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
                                 'BattV_Min')) |> 
   ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-22'), Sys.Date()) +
+  xlim(as.POSIXct('2023-11-22'), Sys.Date() + 1) +
   # ylab('Temp (°C)') +
   scale_color_manual(values = c("#bd3106", "#eebe04", "#5b7314",
                                 "#454b87")) +
