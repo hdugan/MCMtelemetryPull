@@ -7,6 +7,7 @@ library(lubridate)
 source('src/DOconvert.R')
 
 # for googledrive
+# https://www.obrien.page/blog/2023/03_10_google_and_github_actions/
 # drive_auth(path = 'ignore/mcmtelemetrypull-d1867fa65877.json') # for local
 drive_auth(path = Sys.getenv('GDRIVE_PAT')) # for github action
 

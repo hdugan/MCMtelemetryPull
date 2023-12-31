@@ -1,5 +1,8 @@
 library(googledrive)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(tidyr)
 library(lubridate)
 
 # Find IDs of recent uploads
