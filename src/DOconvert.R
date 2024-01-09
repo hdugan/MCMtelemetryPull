@@ -35,65 +35,82 @@ ps <- function(pressure, temp) {
 
 # ps(pressure = 1, temp = 10+273.15)
 
+########################### Derive lake salinities from CTD casts #######################
+# Dissolved oxygen sensors deployed at:
+# LF BB 6.67 m
+# 6.645965861	1.042193	2.0554
 
+LFSal.top = swSCTp(
+  conductivity = 1.04, temperature = 2.05, pressure = NULL,
+  conductivityUnit = "mS/cm", eos = getOption("oceEOS", default = "gsw")
+)
 
-# Convert DO solubility to percent
+# Dissolved oxygen sensors deployed at:
+# LF BB 8.85 m
+# 8.830492502	2.714378	2.6859
+
+LFSal.bot = swSCTp(
+  conductivity = 2.71, temperature = 2.68, pressure = NULL,
+  conductivityUnit = "mS/cm", eos = getOption("oceEOS", default = "gsw")
+)
+
+# Dissolved oxygen sensors deployed at:
+# LH BB 6.65 m
+# 6.621754936	0.359222	0.993
+
+LHSal.top = swSCTp(
+  conductivity = 0.359, temperature = 0.993, pressure = NULL,
+  conductivityUnit = "mS/cm", eos = getOption("oceEOS", default = "gsw")
+)
+
+# Dissolved oxygen sensors deployed at:
+# LH BB 10.10 m
+# 10.15171817	0.492027	0.8511
+
+LHSal.bot = swSCTp(
+  conductivity = 0.492, temperature = 0.851, pressure = NULL,
+  conductivityUnit = "mS/cm", eos = getOption("oceEOS", default = "gsw")
+)
+
 # Dissolved oxygen sensors deployed at:
 # ELB 15.95 m - 
-# 15.95472694	18.460161	4.4769
 # 15.95376338	17.617249	4.654
 
 ELBSal.top = swSCTp(
-  conductivity = 18,
-  temperature = 4.5,
-  pressure = NULL,
-  conductivityUnit = "mS/cm",
-  eos = getOption("oceEOS", default = "gsw")
+  conductivity = 17.61, temperature = 4.65, pressure = NULL,
+  conductivityUnit = "mS/cm", eos = getOption("oceEOS", default = "gsw")
 )
 
 # ELB 17.95 m -
-# 17.99264851	29.929814	4.5704
-# 17.908	29.949	4.514
-# 17.90775291	29.582	4.483
+# 17.94985271	30.278634	4.5745
 
 ELBSal.bot = swSCTp(
-  conductivity = 29.9,
-  temperature = 4.5,
-  pressure = NULL,
-  conductivityUnit = "mS/cm",
-  eos = getOption("oceEOS", default = "gsw")
+  conductivity = 30.27, temperature = 4.57, pressure = NULL,
+  conductivityUnit = "mS/cm", eos = getOption("oceEOS", default = "gsw")
 )
 
 # WLB 17.39 m - 
-# 17.43325096	47.339193	0.7324
-# 17.44999946	49.099081	0.2503
-# 17.47	51.32633	0.3073
+# 17.46486026	46.997003	0.5772
 WLBSal.top = swSCTp(
-  conductivity = 50,
-  temperature = 0.3,
-  pressure = NULL,
-  conductivityUnit = "mS/cm",
-  eos = getOption("oceEOS", default = "gsw")
+  conductivity = 46.99, temperature = 0.57, pressure = NULL,
+  conductivityUnit = "mS/cm", eos = getOption("oceEOS", default = "gsw")
 )
 
 # WLB 17.88 m - 
-# 17.886	56.028133	0.0929
-# 17.90758847	55.347987	-0.0614
+# 17.90411112	54.371638	0.3772
 WLBSal.bot = swSCTp(
-  conductivity = 55,
-  temperature = 0.07,
-  pressure = NULL,
-  conductivityUnit = "mS/cm",
-  eos = getOption("oceEOS", default = "gsw")
+  conductivity = 54.37, temperature = 0.377, pressure = NULL,
+  conductivityUnit = "mS/cm", eos = getOption("oceEOS", default = "gsw")
 )
 
+#### Data frame of salinities 
 top.sal = data.frame(location = c("ELBB", "LFBB", "LHBB", "WLBB"), 
-                     depth = c(15.95, NA, NA, 17.47),
-                     salinity = c(ELBSal.top, NA, NA, WLBSal.top))
+                     depth = c(15.95, 6.67, 6.65, 17.47),
+                     salinity = c(ELBSal.top, LFSal.top, LHSal.top, WLBSal.top))
 
 bot.sal = data.frame(location = c("ELBB", "LFBB", "LHBB", "WLBB"), 
-                     depth = c(17.95, NA, NA, 17.88),
-                     salinity = c(ELBSal.bot, NA, NA, WLBSal.bot))
+                     depth = c(17.95, 8.85, 10.10, 17.88),
+                     salinity = c(ELBSal.bot, LFSal.bot, LHSal.bot, WLBSal.bot))
 
 # fs(10 + 273.14, 35)
 # 
