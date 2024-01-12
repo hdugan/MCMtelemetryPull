@@ -5,6 +5,8 @@ library(readr)
 library(tidyr)
 library(lubridate)
 
+source('src/met_functions.R')
+
 # Find IDs of recent uploads
 # drive_find(n_max = 10)
 
