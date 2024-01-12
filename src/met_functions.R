@@ -1,9 +1,11 @@
+# '********************************************************
 # rclow = reverse temperatures to mV and apply clow subroutine to mV values using
 # Steinhart-Hart equation
 # Temp is the unconverted temperature
 # TOffset is the offset betwen individual thermister and factory standard
 
 # Originally coded in VB by TH Nylen, 3-Sep-1999
+# '********************************************************
 
 # rclow ####
 rclow <- function(Temp, TOffset = 0) {
@@ -103,6 +105,7 @@ rclow.bisec <- function(Temp, TOffset = 0) {
   return(bisec) 
 }
 
+# '********************************************************
 #### Flag - Definition (data processing) --> Data manager flag 
 # R - Out of range --> Flag as R, except flag as "U" when IceT20cm exceeds 0 degrees and "V" when IceT1m exceeds 0 degrees
 # Z - Negative values zeroed out (convert to zero)
@@ -112,7 +115,7 @@ rclow.bisec <- function(Temp, TOffset = 0) {
 # S - SwRadOut is greater than a % of SwRadIn
 # N - Wdir and WDirStD zeroed out because WSpd = 0 (Converted to zero)
 # M - Value missing 
-
+# '********************************************************
 
 # Temperature flags
 # Max and min temperature ranges typically 15 and -70
