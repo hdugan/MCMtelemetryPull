@@ -272,10 +272,10 @@ RadCorr <- function(value, Process_Factor, Near0_Min) {
     RadCorr = 0
   }
   if (RadTCorr < Near0_Min) {
-    RadCorr = ''
+    RadCorr = NA
   } 
   if (value == -6999) {
-    RadCorr = ''
+    RadCorr = NA
   } 
   return(RadCorr)
 }

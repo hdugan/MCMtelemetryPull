@@ -66,10 +66,10 @@ for (i in 1:length(sitenames)) {
   colnames(met.df) = c(headers, 'sitename')
   met.df = met.df |> mutate(Year = year(TIMESTAMP))
   
-  # Apply rclow to air temperatures
-  met.df = met.df %>%
-    group_by(1:n()) %>% 
-    mutate_at(vars(contains('AirT')), ~rclow(.))
+  # # Apply rclow to air temperatures
+  # met.df = met.df %>%
+  #   group_by(1:n()) %>% 
+  #   mutate_at(vars(contains('AirT')), ~rclow(.))
 
   if (!'Day_of_Year' %in% names(met.df)){
     met.df = met.df |> mutate(Day_of_Year = yday(TIMESTAMP))
