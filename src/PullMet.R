@@ -160,3 +160,4 @@ ggplot(precip) +
 
 ggsave('Figures/Met_Precip_Telemetry.pdf', width = 6, height = 4)
 ggsave('Figures/Met_Precip_Telemetry.png', width = 8, height = 4)
+
