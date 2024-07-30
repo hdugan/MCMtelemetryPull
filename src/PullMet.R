@@ -104,7 +104,7 @@ p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
   facet_wrap(~sitename, ncol = 3)
 
 # Save figure 
-ggsave('Figures/Met_Battery.pdf', width = 12, height = 10)
+ggsave('Figures/Met_Battery.png', width = 12, height = 10)
 
 ggplot(met.df |> filter(Var == 'AirT3m')) +
   geom_path(data = met.df |> filter(Var == 'WSpd_Avg'), 
@@ -141,7 +141,7 @@ met.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
   facet_wrap(~Var, scales = 'free_y')
 
 # Save figure 
-ggsave('Figures/Met_Ground_Telemetry.pdf', width = 12, height = 10)
+# ggsave('Figures/Met_Ground_Telemetry.pdf', width = 12, height = 10)
 ggsave('Figures/Met_Ground_Telemetry.png', width = 8, height = 5)
 
 ### Plot major variables
@@ -158,7 +158,7 @@ glacier.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
   facet_wrap(~Var, scales = 'free_y')
 
 # Save figure 
-ggsave('Figures/Met_Glacier_Telemetry.pdf', width = 12, height = 10)
+# ggsave('Figures/Met_Glacier_Telemetry.pdf', width = 12, height = 10)
 ggsave('Figures/Met_Glacier_Telemetry.png', width = 8, height = 5)
 
 ## Plot precipitation at Bonney and Hoare
@@ -172,6 +172,6 @@ ggplot(precip) +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank())
 
-ggsave('Figures/Met_Precip_Telemetry.pdf', width = 6, height = 4)
+# ggsave('Figures/Met_Precip_Telemetry.pdf', width = 6, height = 4)
 ggsave('Figures/Met_Precip_Telemetry.png', width = 8, height = 4)
 

@@ -94,7 +94,7 @@ bb.df |> filter(Var %in% c('PTemp_C', 'stage_Avg', 'OSat_Dshallow_Avg',
   facet_wrap(~Var, scales = 'free_y')
 
 # Save figure 
-ggsave('Figures/BB_Telemetry.pdf', width = 12, height = 10)
+# ggsave('Figures/BB_Telemetry.pdf', width = 12, height = 10)
 ggsave('Figures/BB_Telemetry.png', width = 8, height = 5)
 
 
@@ -112,7 +112,7 @@ bb.df |> filter(Var %in% c(#'OSat_Dshallow_Avg','OSat_DOdeep_Avg',
   facet_wrap(~sitename, scales = 'free_y')
 
 # Save figure 
-ggsave('Figures/BB_Oxygen.pdf', width = 12, height = 10)
+ggsave('Figures/BB_Oxygen.png', width = 12, height = 10)
 
 
 # Just battery plots
@@ -126,5 +126,5 @@ ggplot(bb.df |> filter(Var == 'BattV_Min')) +
   facet_wrap(~sitename)
 
 # Save figure 
-ggsave('Figures/BB_Battery.pdf', width = 12, height = 10)
+ggsave('Figures/BB_Battery.png', width = 12, height = 10)
 
