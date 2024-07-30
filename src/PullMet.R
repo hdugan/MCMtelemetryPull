@@ -106,6 +106,20 @@ p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
 # Save figure 
 ggsave('Figures/Met_Battery.pdf', width = 12, height = 10)
 
+ggplot(met.df |> filter(Var == 'AirT3m')) +
+  geom_path(data = met.df |> filter(Var == 'WSpd_Avg'), 
+            aes(x = TIMESTAMP, y = value), color = 'black', linewidth = 0.3) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  ylab('Air Temp (°C) and Wind Speed (m/s)') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~sitename, ncol = 3)
+
+# Save figure 
+ggsave('Figures/Met_AirT3m_WSpd.png', width = 12, height = 10)
+
+
 # Glacier stations
 glacier.df = met.df |> 
   filter(sitename %in% c('CAAM','COHM','HODM','TARM'))
