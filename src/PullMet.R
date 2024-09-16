@@ -137,7 +137,7 @@ met.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
   xlim(as.POSIXct('2023-11-22'), Sys.Date() + 1) +
   # ylab('Temp (°C)') +
   scale_color_manual(values = c("#bd3106", "#d9700e", "#e9a00e", "#eebe04", "#5b7314",
-                                "#c3d6ce", "#89a6bb", "#454b87")) +
+                                "#c3d6ce", "#89a6bb", "#454b87", "#190730")) +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank()) +
   facet_wrap(~Var, scales = 'free_y')
