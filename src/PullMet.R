@@ -8,7 +8,7 @@ library(lubridate)
 source('src/met_functions.R')
 
 # Find IDs of recent uploads
-# drive_find(n_max = 10)
+# drive_find(n_max = 20)
 
 # for googledrive
 # https://www.obrien.page/blog/2023/03_10_google_and_github_actions/
@@ -32,6 +32,8 @@ drive_download(as_id('13MdIZKde_XaqExVfjNM-34NZAeMd-WMJ'), path = 'TempData/COHM
 drive_download(as_id('13DD4emyuwF-mhnGPO_pOldFm6Hk34p7C'), path = 'TempData/EXEM15.dat', overwrite = TRUE)
 # FLMM15
 drive_download(as_id('17cdUcPgkRHweXxvTp4W5P6qPEQAXAxKh'), path = 'TempData/FLMM15.dat', overwrite = TRUE)
+# FRSM15
+drive_download(as_id('17oWPOd_aZYSPo436r5c7ioalbHKDP2cX'), path = 'TempData/FRSM15.dat', overwrite = TRUE)
 # FRLM15
 drive_download(as_id('15anL99xr6c6u0KxQJj8CZPAyknDcA4q6'), path = 'TempData/FRLM15.dat', overwrite = TRUE)
 # HODM15
