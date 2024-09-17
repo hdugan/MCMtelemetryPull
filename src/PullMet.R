@@ -119,6 +119,32 @@ p.pressure = ggplot(met.df |> filter(Var == 'Pressure')) +
 # Save figure 
 ggsave('Figures/Met_Pressure.png', width = 12, height = 10)
 
+# Plot of sonics 
+p.sonic = ggplot(met.df |> filter(Var %in% c('Depth')) |> filter(value > 0)) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  ylab('Distance (cm)') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~sitename, scales = 'free_y', ncol = 3)
+
+# Save figure 
+ggsave('Figures/Met_Sonic.png', width = 12, height = 10)
+
+# Figure of soil temp
+p.soil0 = ggplot(met.df |> filter(Var %in% c('SoilT0cm'))) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  geom_path(data = met.df |> filter(Var %in% c('SoilT10cm')), aes(x = TIMESTAMP, y = value), 
+            color = 'black', width = 0.3) +
+  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  ylab('Soil Temp (°C)') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~sitename, scales = 'free_y', ncol = 3)
+# Save figure 
+ggsave('Figures/Met_SoilTemp0.png', width = 12, height = 10)
+
+
 # Figure of airtemp + wind speed from met stations 
 ggplot(met.df |> filter(Var == 'AirT3m')) +
   geom_path(data = met.df |> filter(Var == 'WSpd_Avg'), 
