@@ -96,7 +96,7 @@ do.call(file.remove, removefiles)
 # get table of variables
 table(met.df$Var)
 
-# Just battery plots
+# Just battery plots (all stations)
 p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
@@ -108,6 +108,19 @@ p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
 # Save figure 
 ggsave('Figures/Met_Battery.png', width = 12, height = 10)
 
+# Just battery plots
+p.pressure = ggplot(met.df |> filter(Var == 'Pressure')) +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  ylab('Pressure (mb)') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~sitename, ncol = 3)
+
+# Save figure 
+ggsave('Figures/Met_Pressure.png', width = 12, height = 10)
+
+# Figure of airtemp + wind speed from met stations 
 ggplot(met.df |> filter(Var == 'AirT3m')) +
   geom_path(data = met.df |> filter(Var == 'WSpd_Avg'), 
             aes(x = TIMESTAMP, y = value), color = 'black', linewidth = 0.3) +
