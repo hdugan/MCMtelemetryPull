@@ -108,14 +108,13 @@ p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
 # Save figure 
 ggsave('Figures/Met_Battery.png', width = 12, height = 10)
 
-# Just battery plots
+# Just pressure plot
 p.pressure = ggplot(met.df |> filter(Var == 'Pressure')) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
   ylab('Pressure (mb)') +
   theme_bw(base_size = 10) +
-  theme(axis.title.x = element_blank()) +
-  facet_wrap(~sitename, ncol = 3)
+  theme(axis.title.x = element_blank()) 
 
 # Save figure 
 ggsave('Figures/Met_Pressure.png', width = 12, height = 10)
