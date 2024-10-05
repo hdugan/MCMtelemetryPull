@@ -98,8 +98,10 @@ table(met.df$Var)
 
 # Just battery plots (all stations)
 p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
+  geom_hline(aes(yintercept = 12), linetype = 2, linewidth = 0.2) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  ylim(9,NA) +
   ylab('Battery (V)') +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank()) +
