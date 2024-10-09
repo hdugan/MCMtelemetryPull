@@ -4,6 +4,7 @@ library(ggplot2)
 library(readr)
 library(tidyr)
 library(lubridate)
+library(patchwork)
 
 source('src/met_functions.R')
 
@@ -216,4 +217,36 @@ ggplot(precip) +
 
 # ggsave('Figures/Met_Precip_Telemetry.pdf', width = 6, height = 4)
 ggsave('Figures/Met_Precip_Telemetry.png', width = 8, height = 4)
+
+# Last week at Lake Fryxell 
+fryx = met.df |> filter(sitename %in% c('FRLM')) |> 
+  filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn')) |> 
+  pivot_wider(names_from = Var, values_from = value) |> 
+  filter(TIMESTAMP >= as.POSIXct(Sys.Date() - 7))
+
+p1 = ggplot(fryx) +
+  geom_path(aes(x = TIMESTAMP, y = AirT3m), color = "#bd3106") +
+  xlim(as.POSIXct(Sys.Date() - 7), Sys.Date() + 1) +
+  ylab('Air Temp (°C)') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) +
+  labs(title = 'Last week at Lake Fryxell') 
+
+p2 = ggplot(fryx) +
+  geom_path(aes(x = TIMESTAMP, y = SwRadIn), color = "#eebe04") +
+  xlim(as.POSIXct(Sys.Date() - 7), Sys.Date() + 1) +
+  ylab('Solar Radiation (W/m2)') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) 
+
+p3 = ggplot(fryx) +
+  geom_path(aes(x = TIMESTAMP, y = WSpd_Avg), color = "#82a1bd") +
+  xlim(as.POSIXct(Sys.Date() - 7), Sys.Date() + 1) +
+  ylab('Wind Speed (m/s)') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) 
+
+p1 / p2 / p3
+ggsave('Figures/Met_FryxellCurrent.png', width = 6, height = 6, dpi = 500)
+
 
