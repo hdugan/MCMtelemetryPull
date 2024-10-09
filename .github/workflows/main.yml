@@ -49,6 +49,7 @@ jobs:
         R -e 'install.packages("ggplot2")'
         R -e 'install.packages("tidyr")'
         R -e 'install.packages("readr")'
+        R -e 'install.packages("patchwork")'
         R -e 'install.packages("lubridate")'
         R -e 'install.packages("oce")'
       
