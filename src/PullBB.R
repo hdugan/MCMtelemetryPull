@@ -82,7 +82,7 @@ removefiles = list(list.files("TempData/", full.names = TRUE, pattern = '.dat'))
 do.call(file.remove, removefiles)
 
 ### Plot major variables
-bb.df |> filter(Var %in% c('PTemp_C', 'stage_Avg', 'OSat_Dshallow_Avg',
+p.bb = bb.df |> filter(Var %in% c('PTemp_C', 'stage_Avg', 'OSat_Dshallow_Avg',
                            'OSat_DOdeep_Avg', 'ablation_Avg', 'BattV_Min')) |> 
   ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
@@ -95,11 +95,11 @@ bb.df |> filter(Var %in% c('PTemp_C', 'stage_Avg', 'OSat_Dshallow_Avg',
 
 # Save figure 
 # ggsave('Figures/BB_Telemetry.pdf', width = 12, height = 10)
-ggsave('Figures/BB_Telemetry.png', width = 8, height = 5)
+ggsave(plot = p.bb, 'Figures/BB_Telemetry.png', width = 8, height = 5)
 
 
 ### Plot oxygen correct
-bb.df |> filter(Var %in% c(#'OSat_Dshallow_Avg','OSat_DOdeep_Avg', 
+p.oxygen = bb.df |> filter(Var %in% c(#'OSat_Dshallow_Avg','OSat_DOdeep_Avg', 
                            "Conc_mgL_DOshallow_Avg", "Conc_mgL_DOdeep_Avg",
                            "DO.actualShallow.mgl", "DO.actualDeep.mgl")) |> 
   ggplot() +
@@ -112,11 +112,11 @@ bb.df |> filter(Var %in% c(#'OSat_Dshallow_Avg','OSat_DOdeep_Avg',
   facet_wrap(~sitename, scales = 'free_y')
 
 # Save figure 
-ggsave('Figures/BB_Oxygen.png', width = 12, height = 10)
+ggsave(plot = p.oxygen, 'Figures/BB_Oxygen.png', width = 12, height = 10)
 
 
 # Just battery plots
-ggplot(bb.df |> filter(Var == 'BattV_Min')) +
+p.battery = ggplot(bb.df |> filter(Var == 'BattV_Min')) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
   ylab('Battery (V)') +
@@ -126,5 +126,5 @@ ggplot(bb.df |> filter(Var == 'BattV_Min')) +
   facet_wrap(~sitename)
 
 # Save figure 
-ggsave('Figures/BB_Battery.png', width = 12, height = 10)
+ggsave(plot = p.battery, 'Figures/BB_Battery.png', width = 12, height = 10)
 

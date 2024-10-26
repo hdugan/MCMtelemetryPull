@@ -145,11 +145,11 @@ p.soil0 = ggplot(met.df |> filter(Var %in% c('SoilT0cm'))) +
   theme(axis.title.x = element_blank()) +
   facet_wrap(~sitename, scales = 'free_y', ncol = 3)
 # Save figure 
-ggsave('Figures/Met_SoilTemp0.png', width = 12, height = 10)
+ggsave(plot = p.soil0, 'Figures/Met_SoilTemp0.png', width = 12, height = 10)
 
 
 # Figure of airtemp + wind speed from met stations 
-ggplot(met.df |> filter(Var == 'AirT3m')) +
+p.air = ggplot(met.df |> filter(Var == 'AirT3m')) +
   geom_path(data = met.df |> filter(Var == 'WSpd_Avg'), 
             aes(x = TIMESTAMP, y = value), color = 'black', linewidth = 0.3) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
@@ -160,7 +160,7 @@ ggplot(met.df |> filter(Var == 'AirT3m')) +
   facet_wrap(~sitename, ncol = 3)
 
 # Save figure 
-ggsave('Figures/Met_AirT3m_WSpd.png', width = 12, height = 10)
+ggsave(plot = p.air, 'Figures/Met_AirT3m_WSpd.png', width = 12, height = 10)
 
 
 # Glacier stations
@@ -171,7 +171,7 @@ met.df = met.df |>
   filter(!sitename %in% c('CAAM','COHM','HODM','TARM'))
 
 ### Plot major variables
-met.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
+p.metground = met.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
                             'BattV_Min')) |> 
   ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
@@ -185,10 +185,10 @@ met.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
 
 # Save figure 
 # ggsave('Figures/Met_Ground_Telemetry.pdf', width = 12, height = 10)
-ggsave('Figures/Met_Ground_Telemetry.png', width = 8, height = 5)
+ggsave(plot = p.metground, 'Figures/Met_Ground_Telemetry.png', width = 8, height = 5)
 
 ### Plot major variables
-glacier.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
+p.glaciers = glacier.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
                                 'BattV_Min')) |> 
   ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
@@ -202,12 +202,12 @@ glacier.df |> filter(Var %in% c('AirT3m', 'WSpd_Avg', 'SwRadIn',
 
 # Save figure 
 # ggsave('Figures/Met_Glacier_Telemetry.pdf', width = 12, height = 10)
-ggsave('Figures/Met_Glacier_Telemetry.png', width = 8, height = 5)
+ggsave(plot = p.glaciers, 'Figures/Met_Glacier_Telemetry.png', width = 8, height = 5)
 
 ## Plot precipitation at Bonney and Hoare
 precip = met.df |> filter(sitename %in% c('BOYM', 'HO2M'), Var == 'Precip_TotalNRT')
 
-ggplot(precip) +
+p.precip = ggplot(precip) +
   geom_point(aes(x = TIMESTAMP, y = value, fill = sitename), shape = 21, stroke = 0.01) +
   ylab('Precip Total NRT (mm)') +
   scale_fill_manual(values = c("#bd3106", 
@@ -216,7 +216,7 @@ ggplot(precip) +
   theme(axis.title.x = element_blank())
 
 # ggsave('Figures/Met_Precip_Telemetry.pdf', width = 6, height = 4)
-ggsave('Figures/Met_Precip_Telemetry.png', width = 8, height = 4)
+ggsave(plot = p.precip, 'Figures/Met_Precip_Telemetry.png', width = 8, height = 4)
 
 # Last week at Lake Fryxell 
 fryx = met.df |> filter(sitename %in% c('FRLM')) |> 
@@ -246,7 +246,7 @@ p3 = ggplot(fryx) +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank()) 
 
-p1 / p2 / p3
-ggsave('Figures/Met_FryxellCurrent.png', width = 6, height = 6, dpi = 500)
+p.frx = p1 / p2 / p3
+ggsave(plot = p.frx, 'Figures/Met_FryxellCurrent.png', width = 6, height = 6, dpi = 500)
 
 

@@ -45,16 +45,28 @@ jobs:
       #   use-public-rspm: true
 
     # Set-up R
+    # - name: Install packages
+    #   run: |
+    #     R -e 'install.packages("googledrive")'
+    #     R -e 'install.packages("dplyr")'
+    #     R -e 'install.packages("ggplot2")'
+    #     R -e 'install.packages("tidyr")'
+    #     R -e 'install.packages("readr")'
+    #     R -e 'install.packages("patchwork")'
+    #     R -e 'install.packages("lubridate")'
+    #     R -e 'install.packages("oce")'
+    #     
     - name: Install packages
-      run: |
-        R -e 'install.packages("googledrive")'
-        R -e 'install.packages("dplyr")'
-        R -e 'install.packages("ggplot2")'
-        R -e 'install.packages("tidyr")'
-        R -e 'install.packages("readr")'
-        R -e 'install.packages("patchwork")'
-        R -e 'install.packages("lubridate")'
-        R -e 'install.packages("oce")'
+      uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        packages: |
+          any::lubridate
+          any::googledrive
+          any::ggplot2
+          any::tidyr
+          any::readr
+          any::patchwork
+          any::oce
       
     # Run R script
     - name: Scrape
