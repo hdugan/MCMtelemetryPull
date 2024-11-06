@@ -5,6 +5,7 @@ library(readr)
 library(tidyr)
 library(lubridate)
 library(patchwork)
+library(zoo)
 
 source('src/met_functions.R')
 
@@ -123,16 +124,33 @@ p.pressure = ggplot(met.df |> filter(Var == 'Pressure')) +
 ggsave('Figures/Met_Pressure.png', width = 12, height = 10)
 
 # Plot of sonics 
-p.sonic = ggplot(met.df |> filter(Var %in% c('Depth')) |> filter(value > 0)) +
-  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+# p.sonic = ggplot(met.df |> filter(Var %in% c('Depth')) |> filter(value > 0)) +
+#   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+#   xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+#   ylab('Distance (cm)') +
+#   theme_bw(base_size = 10) +
+#   theme(axis.title.x = element_blank()) +
+#   facet_wrap(~sitename, scales = 'free_y', ncol = 3)
+
+p.sonic = met.df |> 
+  filter(Var %in% c('Depth', 'AirT3m')) |> 
+  pivot_wider(names_from = Var, values_from = value) |> 
+  mutate(TCDT = Depth * sqrt((AirT3m + 273.15)/273.15)) |> 
+  filter(TCDT > 0 & TCDT < 600) |> 
+  mutate(TCDT = if_else(sitename == 'BOYM' & TCDT > 55, NA, TCDT)) |> 
+  mutate(TCDT = if_else(sitename == 'BOYM' & TCDT < 45, NA, TCDT)) |> 
+  mutate(ma2=rollapply(TCDT,12,mean,align='right',fill=NA)) |> 
+  filter(TIMESTAMP >= as.POSIXct('2023-11-24')) |> 
+  ggplot() +
+  geom_path(aes(x = TIMESTAMP, y = ma2, color = sitename)) +
   xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
   ylab('Distance (cm)') +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank()) +
   facet_wrap(~sitename, scales = 'free_y', ncol = 3)
-
 # Save figure 
-ggsave('Figures/Met_Sonic.png', width = 12, height = 10)
+ggsave('Figures/Met_Sonic_Adjusted.png', width = 12, height = 10)
+
 
 # Figure of soil temp
 p.soil0 = ggplot(met.df |> filter(Var %in% c('SoilT0cm'))) +

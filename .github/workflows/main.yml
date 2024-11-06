@@ -67,6 +67,7 @@ jobs:
           any::readr
           any::patchwork
           any::oce
+          any::zoo
       
     # Run R script
     - name: Scrape
