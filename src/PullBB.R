@@ -81,9 +81,12 @@ bb.df = do.call(bind_rows, bb.long.list) |>
 removefiles = list(list.files("TempData/", full.names = TRUE, pattern = '.dat'))
 do.call(file.remove, removefiles)
 
+
 ### Plot major variables
 p.bb = bb.df |> filter(Var %in% c('PTemp_C', 'stage_Avg', 'OSat_Dshallow_Avg',
-                           'OSat_DOdeep_Avg', 'ablation_Avg', 'BattV_Min')) |> 
+                                  'OSat_DOdeep_Avg', 'ablation_Avg', 'BattV_Min')) |>
+  mutate(value = if_else(Var != 'PTemp_C' & value < 1, NA, value)) |>
+  filter(TIMESTAMP >= as.POSIXct('2024-11-15')) |> 
   ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
@@ -100,8 +103,10 @@ ggsave(plot = p.bb, 'Figures/BB_Telemetry.png', width = 8, height = 5)
 
 ### Plot oxygen correct
 p.oxygen = bb.df |> filter(Var %in% c(#'OSat_Dshallow_Avg','OSat_DOdeep_Avg', 
-                           "Conc_mgL_DOshallow_Avg", "Conc_mgL_DOdeep_Avg",
-                           "DO.actualShallow.mgl", "DO.actualDeep.mgl")) |> 
+  "Conc_mgL_DOshallow_Avg", "Conc_mgL_DOdeep_Avg",
+  "DO.actualShallow.mgl", "DO.actualDeep.mgl")) |> 
+  filter(value > 1) |> 
+  filter(TIMESTAMP >= as.POSIXct('2024-11-15'))|> 
   ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = Var)) +
   xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
@@ -116,7 +121,9 @@ ggsave(plot = p.oxygen, 'Figures/BB_Oxygen.png', width = 12, height = 10)
 
 
 # Just battery plots
-p.battery = ggplot(bb.df |> filter(Var == 'BattV_Min')) +
+p.battery = ggplot(bb.df |> filter(Var == 'BattV_Min') |> 
+                     filter(value > 1) |> 
+                     filter(TIMESTAMP >= as.POSIXct('2024-11-15'))) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
   ylab('Battery (V)') +
