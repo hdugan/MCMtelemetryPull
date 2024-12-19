@@ -102,7 +102,7 @@ table(met.df$Var)
 p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
   geom_hline(aes(yintercept = 12), linetype = 2, linewidth = 0.2) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
   ylim(9,NA) +
   ylab('Battery (V)') +
   theme_bw(base_size = 10) +
@@ -113,9 +113,9 @@ p.batt = ggplot(met.df |> filter(Var == 'BattV_Min')) +
 ggsave('Figures/Met_Battery.png', width = 12, height = 10)
 
 # Just pressure plot
-p.pressure = ggplot(met.df |> filter(Var == 'Pressure')) +
+p.pressure = ggplot(met.df |> filter(Var == 'Pressure') |> filter(value > 700 & value < 1050)) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
   ylab('Pressure (mb)') +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank()) 
@@ -124,32 +124,33 @@ p.pressure = ggplot(met.df |> filter(Var == 'Pressure')) +
 ggsave('Figures/Met_Pressure.png', width = 12, height = 10)
 
 # Plot of sonics 
-# p.sonic = ggplot(met.df |> filter(Var %in% c('Depth')) |> filter(value > 0)) +
-#   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-#   xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
-#   ylab('Distance (cm)') +
-#   theme_bw(base_size = 10) +
-#   theme(axis.title.x = element_blank()) +
-#   facet_wrap(~sitename, scales = 'free_y', ncol = 3)
+sonic_old = met.df |>
+  filter(Var %in% c('Depth', 'AirT3m')) |>
+  pivot_wider(names_from = Var, values_from = value, values_fn = mean) |>
+  filter(!is.na(Depth)) |> 
+  mutate(TCDT = Depth * sqrt((AirT3m + 273.15)/273.15)) |> 
+  select(TIMESTAMP, sitename, TCDT)
 
-# p.sonic = met.df |> 
-#   filter(Var %in% c('TCDT')) |> 
-#   pivot_wider(names_from = Var, values_from = value) |> 
-#   mutate(TCDT = Depth * sqrt((AirT3m + 273.15)/273.15)) |> 
-#   filter(TCDT > 0 & TCDT < 600) |> 
-#   mutate(TCDT = if_else(sitename == 'BOYM' & TCDT > 55, NA, TCDT)) |> 
-#   mutate(TCDT = if_else(sitename == 'BOYM' & TCDT < 45, NA, TCDT)) |> 
-#   mutate(ma2=rollapply(TCDT,12,mean,align='right',fill=NA)) |> 
-#   filter(TIMESTAMP >= as.POSIXct('2023-11-24')) |> 
-#   ggplot() +
-#   geom_path(aes(x = TIMESTAMP, y = ma2, color = sitename)) +
-#   xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
-#   ylab('Distance (cm)') +
-#   theme_bw(base_size = 10) +
-#   theme(axis.title.x = element_blank()) +
-#   facet_wrap(~sitename, scales = 'free_y', ncol = 3)
+
+p.sonic = met.df |>
+  filter(Var %in% c('TCDT')) |>
+  pivot_wider(names_from = Var, values_from = value, values_fn = mean) |>
+  bind_rows(sonic_old) |> 
+  # mutate(TCDT = Depth * sqrt((AirT3m + 273.15)/273.15)) |>
+  filter(TCDT > 0 & TCDT < 600) |>
+  mutate(TCDT = if_else(sitename == 'BOYM' & TCDT > 55, NA, TCDT)) |>
+  mutate(TCDT = if_else(sitename == 'BOYM' & TCDT < 45, NA, TCDT)) |>
+  mutate(ma2=rollapply(TCDT,12,mean,align='right',fill=NA)) |>
+  filter(TIMESTAMP >= as.POSIXct('2024-11-15')) |>
+  ggplot() +
+  geom_path(aes(x = TIMESTAMP, y = ma2, color = sitename)) +
+  xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
+  ylab('Distance (cm)') +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~sitename, scales = 'free_y', ncol = 3)
 # # Save figure 
-# ggsave('Figures/Met_Sonic_Adjusted.png', width = 12, height = 10)
+ggsave('Figures/Met_Sonic_Adjusted.png', width = 12, height = 10)
 
 
 # Figure of soil temp
@@ -157,7 +158,7 @@ p.soil0 = ggplot(met.df |> filter(Var %in% c('SoilT0cm'))) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
   geom_path(data = met.df |> filter(Var %in% c('SoilT10cm')), aes(x = TIMESTAMP, y = value), 
             color = 'black', width = 0.3) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
   ylab('Soil Temp (°C)') +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank()) +
@@ -171,7 +172,7 @@ p.air = ggplot(met.df |> filter(Var == 'AirT3m')) +
   geom_path(data = met.df |> filter(Var == 'WSpd_Avg'), 
             aes(x = TIMESTAMP, y = value), color = 'black', linewidth = 0.3) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
   ylab('Air Temp (°C) and Wind Speed (m/s)') +
   theme_bw(base_size = 10) +
   theme(axis.title.x = element_blank()) +

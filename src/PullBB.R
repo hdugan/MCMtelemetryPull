@@ -86,7 +86,7 @@ p.bb = bb.df |> filter(Var %in% c('PTemp_C', 'stage_Avg', 'OSat_Dshallow_Avg',
                            'OSat_DOdeep_Avg', 'ablation_Avg', 'BattV_Min')) |> 
   ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
   # ylab('Temp (°C)') +
   scale_color_manual(values = c("#dd5129", "#0f7ba2", "#43b284", "#fab255")) +
   theme_bw(base_size = 10) +
@@ -104,7 +104,7 @@ p.oxygen = bb.df |> filter(Var %in% c(#'OSat_Dshallow_Avg','OSat_DOdeep_Avg',
                            "DO.actualShallow.mgl", "DO.actualDeep.mgl")) |> 
   ggplot() +
   geom_path(aes(x = TIMESTAMP, y = value, color = Var)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
   ylab('DO (mg/L)') +
   scale_color_manual(values = c("#dd5129", "#0f7ba2", "red4", "navy")) +
   theme_bw(base_size = 10) +
@@ -118,7 +118,7 @@ ggsave(plot = p.oxygen, 'Figures/BB_Oxygen.png', width = 12, height = 10)
 # Just battery plots
 p.battery = ggplot(bb.df |> filter(Var == 'BattV_Min')) +
   geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
-  xlim(as.POSIXct('2023-11-24'), Sys.Date() + 1) +
+  xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
   ylab('Battery (V)') +
   scale_color_manual(values = c("#dd5129", "#0f7ba2", "#43b284", "#fab255")) +
   theme_bw(base_size = 10) +
