@@ -97,8 +97,24 @@ p.bb = bb.df |> filter(Var %in% c('PTemp_C', 'stage_Avg', 'OSat_Dshallow_Avg',
   facet_wrap(~Var, scales = 'free_y')
 
 # Save figure 
-# ggsave('Figures/BB_Telemetry.pdf', width = 12, height = 10)
 ggsave(plot = p.bb, 'Figures/BB_Telemetry.png', width = 8, height = 5)
+
+
+### Plot stage
+p.stage = bb.df |> filter(Var %in% c('stage_Avg')) |>
+  filter(value >= 6.5) |> 
+  filter(TIMESTAMP >= as.POSIXct('2024-11-15')) |> 
+  ggplot() +
+  geom_path(aes(x = TIMESTAMP, y = value, color = sitename)) +
+  xlim(as.POSIXct('2024-11-15'), Sys.Date() + 1) +
+  # ylab('Temp (°C)') +
+  scale_color_manual(values = c("#dd5129", "#0f7ba2", "#43b284", "#fab255")) +
+  theme_bw(base_size = 10) +
+  theme(axis.title.x = element_blank()) +
+  facet_wrap(~sitename, scales = 'free_y')
+
+# Save figure 
+ggsave(plot = p.stage, 'Figures/BB_Stage.png', width = 8, height = 5)
 
 
 ### Plot oxygen correct
