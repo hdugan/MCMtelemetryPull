@@ -10,9 +10,8 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    # - cron: "12 7 */1 * *" # Every 1 day at 7:12 AM
-    - cron: "0 */6 * * *" # Every 6th hour at 0:00
-    # - cron: */5 * * * *	#Execute a command every five minutes.
+    - cron: "12 7 */1 * *" # Every 1 day at 7:12 AM
+    # - cron: "0 */6 * * *" # Every 6th hour at 0:00
     # Great way to figure this out: https://crontab.guru/#0_*/6_*_*_*
     
   # Allows you to run this workflow manually from the Actions tab
